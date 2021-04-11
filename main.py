@@ -4,8 +4,8 @@ pygame.init()
 form_width = 600
 form_height = 600
 form = pygame.display.set_mode((form_width, form_height))
-brick_img = pygame.image.load('brick.png').convert_alpha()
-enemy_img = pygame.image.load('enemi.png').convert_alpha()
+brick_img = pygame.image.load('img/brick.png').convert_alpha()
+enemy_img = pygame.image.load('img/enemi.png').convert_alpha()
 
 level = ['---------------',
 		 '-             -',
@@ -27,10 +27,10 @@ level = ['---------------',
 class Player():
 	def __init__(self, form, x, y):
 		self.form = form
-		self.img = [ pygame.image.load('1.png').convert_alpha(),
-					 pygame.image.load('1_d.png').convert_alpha(),
-					 pygame.image.load('1_l.png').convert_alpha(),
-					 pygame.image.load('1_r.png').convert_alpha()
+		self.img = [ pygame.image.load('img/1.png').convert_alpha(),
+					 pygame.image.load('img/1_d.png').convert_alpha(),
+					 pygame.image.load('img/1_l.png').convert_alpha(),
+					 pygame.image.load('img/1_r.png').convert_alpha()
 					 ]
 		self.hitbox = self.img[0].get_rect()
 		self.x = x
@@ -66,7 +66,7 @@ class Wall():
 		self.y = y
 		self.form = form
 		if type == '-':
-			self.img = pygame.image.load('brick.png').convert_alpha()
+			self.img = pygame.image.load('img/brick.png').convert_alpha()
 		self.hitbox = pygame.Rect((x, y, width, height))
 
 	def draw(self):
@@ -77,15 +77,15 @@ class Bullet():
 	# Класс пули
 	def __init__(self, form, x, y, side):
 		self.form = form
-		self.img = [ pygame.image.load('bullet_up.png').convert_alpha(),
-					 pygame.image.load('bullet_down.png').convert_alpha(),
-					 pygame.image.load('bullet_left.png').convert_alpha(),
-					 pygame.image.load('bullet_right.png').convert_alpha()
+		self.img = [ pygame.image.load('img/bullet_up.png').convert_alpha(),
+					 pygame.image.load('img/bullet_down.png').convert_alpha(),
+					 pygame.image.load('img/bullet_left.png').convert_alpha(),
+					 pygame.image.load('img/bullet_right.png').convert_alpha()
 					 ]
 		self.hitbox = self.img[0].get_rect()
-		self.x = x
-		self.y = y
-		self.speed = 1
+		self.hitbox.x = x + 15
+		self.hitbox.y = y + 16
+		self.speed = 3
 		self.side = side
 
 	def move(self):
@@ -100,7 +100,13 @@ class Bullet():
 		if self.side == 3:
 			self.hitbox.x += self.speed
 
-		self.form.blit(self.img[self.side], (self.hitbox.center))
+		self.form.blit(self.img[self.side], (self.hitbox))
+
+	def del_bullet(self):
+		if self.hitbox.bottom < 0 or self.hitbox.top > self.form.get_height() or self.hitbox.right < 0 or self.hitbox.left > self.form.get_width():
+			return True
+
+
 
 
 def level_generation():
@@ -177,9 +183,11 @@ while play:
 			if i.key == pygame.K_RIGHT:
 				right = False
 
-
-	for bullet in bullets:
-		bullet.move()
+	print(len(bullets))
+	for i in range(0, len(bullets)):
+		bullets[i].move()
+		if bullets[i].del_bullet():
+			del bullets[i]
 
 	pygame.display.update()
 	pygame.time.delay(5)
